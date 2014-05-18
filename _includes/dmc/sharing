@@ -1,0 +1,8 @@
+{% if site.safe and site.dmc.sharing.provider and page.dmc.sharing != false %}
+
+{% case site.dmc.sharing.provider %}
+{% when "custom" %}
+  {% include custom/sharing %}
+{% endcase %}
+
+{% endif %}
