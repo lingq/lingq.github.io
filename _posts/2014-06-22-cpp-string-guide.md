@@ -707,8 +707,14 @@ ATLTRACE("The string is: %s in line %d\n", (LPCSTR) bs, nLine);
 常用的字符串类之间的转换方法是：将源字符串转换为C类型字符串指针，然后将该指针传递给目标类的构造函数。下面列出将字符串转换为C类型指针的方法，以及哪些类的构造函数接受C类型指针。
 | Class | string type  | convert to char*? | convert to const char*? | convert to wchar_t*? | convert to const wchar_t*? | convert to BSTR? | construct from char*? | construct from wchar_t*?|
 | :--------:   | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  |
-| _bstr_t | BSTR | yes, cast | yes, cast | yes, cast | yes | yes | yes|
-
+| _bstr_t | BSTR | yes, cast | yes, cast | yes, cast | yes, cast | yes | yes | yes|
+| _variant_t | BSTR | no | no | no | cast to _bstr_t | cast to _bstr_t | yes| yes|
+| string | MBCS | no | yes, c_str() method | no | no | no | yes| no|
+| wstring | Unicode | no | no | no | yes, c_str() method | no | no| yes|
+| CComBSTR | BSTR | no | no | no | yes, cast to BSTR | yes, cast | yes| yes|
+| CComVariant | BSTR | no | no | no | yes | yes | yes| yes|
+| CString | TCHAR | no | in MBCS builds, cast | no | in Unicode builds | no | yes| yes|
+| COleVariant | BSTR | no | no | no | yes | yes | in MBCS builds| in Unicode builds|
 
 
 附注：
