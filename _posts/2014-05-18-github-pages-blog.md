@@ -9,7 +9,7 @@ group: blog
 ---
 {% include dmc/setup %}
 
-{% highlight c script %}
+{% highlight cpp script %}
 /* hello world demo */
 #include <stdio.h>
 int main(int argc, char **argv)
