@@ -33,10 +33,10 @@ C++字符串完全指南 - Win32字符编码
 
 单字节字符集是拉丁字母，重音文字，用ASCII标准定义，用于DOS操作系统。双字节字符集用于东亚和中东语言。Unicode用于COM和Windows NT内部。
 读者都很熟悉单字节字符集，它的数据类型是`char`。双字节字符集也使用`char`数据类型(双字节字符集中的许多古怪处之一)。Unicode字符集用`wchar_t`数据类型。Unicode字符串用L前缀起头，如：
-```cpp
+{% highlight cpp script %}
 wchar_t  wch = L'1';      // 2 个字节, 0x0031
 wchar_t* wsz = L"Hello";  // 12 个字节, 6 个宽字符
-```
+{% endhighlight %}
 字符串的存储
 --------------------------------------------------
 单字节字符串顺序存放各个字符，并用零字节表示字符串结尾。例如，字符串"Bob"的存储格式为：
@@ -72,7 +72,7 @@ x86 CPU的排列顺序是低位优先(little-endian)的，值0x0042的存储顺�
 先说明原则2，因为很容易找到一个非人为的示例。
 假设，有一个配制文件，程序启动时要从安装路径读取该文件，如：C:\Program Files\MyCoolApp\config.bin。文件本身是正常的。
 假设用以下代码来配制文件名：
-```cpp
+{% highlight cpp script %}
 bool GetConfigFileName ( char* pszName, size_t nBuffSize )
 {
     char szConfigFilename[MAX_PATH];
@@ -99,7 +99,7 @@ bool GetConfigFileName ( char* pszName, size_t nBuffSize )
         return true;
     }
 }
-```
+{% endhighlight %}
 这段代码的保护性是很强的，但用到DBCS字符串还是会出错。假如文件的安装路径用日语表达：C:\ヨウユソ，该字符串的内存表达为：
 
 这时用上面的GetConfigFileName()函数来检查文件路径末尾是否含有反斜线就会出错，得到错误的文件名。
@@ -107,7 +107,7 @@ bool GetConfigFileName ( char* pszName, size_t nBuffSize )
 错在哪里？注意上面的二个十六进制值0x5C(蓝色)。前面的0x5C是字符"\"，后面则是字符值83 5C，代表字符"ソ"。可是函数把它误认为反斜线了。
 
 正确的方法是用DBCS函数将指针指向恰当的字符位置，如下所示：
-```cpp
+{% highlight cpp script %}
 bool FixedGetConfigFileName ( char* pszName, size_t nBuffSize )
 {
     char szConfigFilename[MAX_PATH];
@@ -134,7 +134,7 @@ bool FixedGetConfigFileName ( char* pszName, size_t nBuffSize )
         return true;
     }
 } 
-```
+{% endhighlight %}
 这个改进的函数用`CharPrev()` API 函数将指针`pLastChar`向后移动一个字符。如果字符串末尾的字符是双字节字符，就向后移动2个字节。这时返回的结果是正确的，因为不会将字符误判为反斜线。
 
 现在可以想像到第一原则了。例如，要遍历字符串寻找字符":"，如果不使用`CharNext()`函数而使用++算子，当跟随字节值恰好也是":"时就会出错。
@@ -144,9 +144,9 @@ bool FixedGetConfigFileName ( char* pszName, size_t nBuffSize )
 >　2a. 绝不可在字符串数组中使用递减下标。
 
 出错原因与原则2相同。例如，设置指针`pLastChar`为：
-```cpp
+{% highlight cpp script %}
 char* pLastChar = &szConfigFilename [strlen(szConfigFilename) - 1];
-```
+{% endhighlight %}
 结果与原则2的出错一样。下标减1就是指针向后移动一个字节，不符原则2。
 
 ###**再谈strxxx() 与_mbsxxx()**
@@ -159,7 +159,7 @@ Win32 API中的MBCS 和 Unicode API的二个字符集
 也许你没有注意到，Win32的API和消息中的字符串处理函数有二种，一种为MCBS字符串，另一种为Unicode字符串。例如，Win32中没有`SetWindowText()`这样的接口，而是用`SetWindowTextA()`和 `SetWindowTextW()`函数。后缀A (表示ANSI)指明是MBCS函数，后缀W(表示宽字符)指明是Unicode函数。
 
 编写Windows程序时，可以选择用MBCS或Unicode API接口函数。用VC AppWizards向导时，如果不修改预处理器设置，缺省使用的是MBCS函数。但是在API接口中没有`SetWindowText()`函数，该如何调用呢？实际上，在`winuser.h`头文件中做了以下定义：
-```cpp
+{% highlight cpp script %}
 BOOL WINAPI SetWindowTextA ( HWND hWnd, LPCSTR lpString );
 BOOL WINAPI SetWindowTextW ( HWND hWnd, LPCWSTR lpString );
 #ifdef UNICODE
@@ -167,29 +167,29 @@ BOOL WINAPI SetWindowTextW ( HWND hWnd, LPCWSTR lpString );
 #else
 #define SetWindowText  SetWindowTextA
 #endif
-```
+{% endhighlight %}
 编写MBCS应用时，不必定义UNICODE，预处理为：
-```cpp
+{% highlight cpp script %}
 #define SetWindowText  SetWindowTextA
-```
+{% endhighlight %}
 然后将`SetWindowText()`处理为真正的API接口函数`SetWindowTextA()` (如果愿意的话，可以直接调用`SetWindowTextA()` 或`SetWindowTextW()`函数，不过很少有此需要)。
 
 如果要将缺省应用接口改为Unicode，就到预处理设置的预处理标记中去掉 `_MBCS`标记，加入`UNICODE` 和 `_UNICODE` (二个标记都要加入，不同的头文件使用不同的标记)。不过，这时要处理普通字符串反而会遇到问题。如有代码：
-```cpp
+{% highlight cpp script %}
 HWND hwnd = GetSomeWindowHandle();
 char szNewText[] = "we love Bob!";
 SetWindowText ( hwnd, szNewText );
-```
+{% endhighlight %}
 编译器将`SetWindowText`置换为`SetWindowTextW`后，代码变为：
-```cpp
+{% highlight cpp script %}
 HWND hwnd = GetSomeWindowHandle();
 char szNewText[] = "we love Bob!";
 SetWindowTextW ( hwnd, szNewText );
-```
+{% endhighlight %}
 看出问题了吧，这里用一个Unicode字符串处理函数来处理单字节字符串。
 
 **第一种解决办法是使用宏定义：**
-```cpp
+{% highlight cpp script %}
 HWND hwnd = GetSomeWindowHandle();
 #ifdef UNICODE
 　wchar_t szNewText[] = L"we love Bob!";
@@ -197,32 +197,32 @@ HWND hwnd = GetSomeWindowHandle();
 　char szNewText[] = "we love Bob!";
 #endif
 SetWindowText ( hwnd, szNewText );
-```
+{% endhighlight %}
 要对每一个字符串都做这样的宏定义显然是令人头痛的。所以用`TCHAR`来解决这个问题：
 **TCHAR的救火角色**
 `TCHAR` 是一种字符类型，适用于MBCS 和 Unicode二种编码。程序中也不必到处使用宏定义。
 `TCHAR`的宏定义如下：
-```cpp
+{% highlight cpp script %}
 #ifdef UNICODE
 　typedef wchar_t TCHAR;
 #else
 　typedef char TCHAR;
 #endif
-```
+{% endhighlight %}
 所以，`TCHAR`中在MBCS程序中是`char`类型，在Unicode中是 `wchar_t` 类型。
 
 对于Unicode字符串，还有个 _T() 宏，用于解决 L 前缀：
-```cpp
+{% highlight cpp script %}
 #ifdef UNICODE
 　#define _T(x) L##x
 #else
 　#define _T(x) x
 #endif
-```
+{% endhighlight %}
 `##` 是预处理算子，将二个变量粘贴在一起。不管什么时候都对字符串用 `_T` 宏处理，这样就可以在Unicode编码中给字符串加上L前缀，如：
-```cpp
+{% highlight cpp script %}
 TCHAR szNewText[] = _T("we love Bob!");
-```
+{% endhighlight %}
 `SetWindowTextA/W` 函数族中还有其它隐藏的宏可以用来代替`strxxx()` 和 `_mbsxxx()` 字符串函数。例如，可以用 `_tcsrchr` 宏取代`strrchr()`，`_mbsrchr()`，或 `wcsrchr()`函数。`_tcsrchr` 根据编码标记为`_MBCS` 或 `UNICODE`，将右式函数做相应的扩展处理。宏定义方法类似于`SetWindowText`
 
 不止`strxxx()`函数族中有`TCHAR`宏定义，其它一些函数中也有。例如，`_stprintf` (取代`sprintf()`和`swprintf()`)，和 `_tfopen` (取代`fopen()` 和 `_wfopen()`)。MSDN的全部宏定义在"`Generic-Text Routine Mappings`"栏目下。
@@ -274,13 +274,13 @@ C语言的字符串容易出错，难以管理，并且往往是黑客到处寻�
 之所以撰写字符串指南这二篇文章，是因为常有人问到如何将X类型的字符串转换到Z类型。提问者使用了强制类型转换`cast`，但不知道为什么不能转换成功。各种各样的字符串类型，特别是`BSTR`，在任何场合都不是三言二语可以讲清的。因此，我以为这些提问者是想让强制类型转换来处理一切。
 
 除非明确规定了转换算子，不要将任何其它类型数据强制转换为`string`。一个字符串不能用强制类型转换到`string`类。例如：
-```cpp
+{% highlight cpp script %}
 void SomeFunc ( LPCWSTR widestr );
 main()
 {
   SomeFunc ( (LPCWSTR) "C:\\foo.txt" );  // 错！
 }
-```
+{% endhighlight %}
 这段代码100%错误。它可以通过编译，因为类型强制转换超越了编译器的类型检验。但是，能够通过编译，并不证明代码是正确的。
 
 下面，我将指出什么时候用类型强制转换是合理的。
@@ -326,23 +326,23 @@ BSTR是Pascal类型字符串(字符串长度值显式地与数据存放在一起
 附带说一下，BSTR可以包含任何数据块，不单是字符。它甚至可以包容内嵌零字符数据。这些不在本文讨论范围。
 
 C++中的BSTR变量其实就是指向字符串首字符的指针。BSTR是这样定义的：
-```cpp
+{% highlight cpp script %}
 typedef OLECHAR* BSTR;
-```
+{% endhighlight %}
 
 这个定义很糟糕，因为事实上BSTR与Unicode字符串不一样。有了这个类型定义，就越过了类型检查，可以混合使用`LPOLESTR`和`BSTR`。向一个需要`LPCOLESTR` (或 `LPCWSTR`)类型数据的函数传递BSTR数据是安全的，反之则不然。所以要清楚了解函数所需的字符串类型，并向函数传递正确类型的字符串。
 
 要知道为什么向一个需要`BSTR`类型数据的函数传递`LPCWSTR`类型数据是不安全的，就别忘了`BSTR`必须在字符串开头的四个字节保留字符串长度值。但`LPCWSTR`字符串中没有这个值。当其它的处理过程(如`Word`)要寻找`BSTR`的长度值时就会找到一堆垃圾或堆栈中的其它数据或其它随机数据。这就导致方法失效，当长度值太大时将导致崩溃。
 
 许多应用接口都使用`BSTR`，但都用到二个最重要的函数来构造和析构`BSTR`。就是`SysAllocString()`和`SysFreeString()`函数。`SysAllocString()`将Unicode字符串拷贝到`BSTR`，`SysFreeString()`释放`BSTR`。示例如下：
-```cpp
+{% highlight cpp script %}
 BSTR bstr = NULL;
 bstr = SysAllocString ( L"Hi Bob!" );
 if ( NULL == bstr )
 // 内存溢出
 // 这里使用bstr
 SysFreeString ( bstr );
-```
+{% endhighlight %}
 当然，各种BSTR包装类都会小心地管理内存。
 
 自动接口中的另一个数据类型是`VARIANT`。它用于在无类型语言，诸如`JScript`，`VBScript`，以及`Visual Basic`，之间传递数据。`VARIANT`可以包容许多不用类型的数据，如`long`和`IDispatch*`。如果`VARIANT`包含一个字符串，这个字符串是`BSTR`类型。在下文的`VARIANT`包装类中我还会谈及更多的`VARIANT`。
@@ -365,7 +365,7 @@ _bstr_t
 3.`_bstr_t`内部保留的指向内存数据块的指针 `wchar_t*` 要遵循`BSTR`格式。**
 
 满足这些条件，即使没有相应的`BSTR`转换文档，`_bstr_t` 也能正常工作。示例如下：
-```cpp
+{% highlight cpp script %}
  // 构造
 _bstr_t bs1 = "char string";        // 从LPCSTR构造 
 _bstr_t bs2 = L"wide char string"; // 从LPCWSTR构造
@@ -382,13 +382,13 @@ BSTR    bstr = bs1.copy();      // 拷贝bs1, 返回BSTR
 
 // ...
 SysFreeString ( bstr );
-```
+{% endhighlight %}
 注意，`_bstr_t` 也可以转换为`char*` 和 `wchar_t*`。这是个设计问题。虽然`char*` 和 `wchar_t*`不是常量指针，但不能用于修改字符串，因为可能会打破内部`BSTR`结构。
 
 _variant_t 
 --------------------------------------------------
 `_variant_t` 是`VARIANT`的完全包装类。它提供多种构造函数和数据转换函数。本文仅讨论与字符串有关的操作。
-```cpp
+{% highlight cpp script %}
 // 构造
 _variant_t v1 = "char string"; // 从LPCSTR 构造
 _variant_t v2 = L"wide char string"; // 从LPCWSTR 构造
@@ -398,7 +398,7 @@ _variant_t v3 = bs1; // 拷贝一个 _bstr_t 对象
 // 数据萃取
 _bstr_t bs2 = v1; // 从VARIANT中提取BSTR
 _bstr_t bs3 = (_bstr_t) v1; // cast OK, 同上
-```
+{% endhighlight %}
 注意，`_variant_t` 方法在转换失败时会抛出异常，所以要准备用catch 捕捉`_com_error`异常。
 
 另外要注意 `_variant_t` 不能直接转换成`MBCS`字符串。要建立一个过渡的`_bstr_t` 变量，用其它提供转换Unicode到`MBCS`的类函数，或ATL转换宏来转换。
@@ -413,7 +413,7 @@ STL类
 STL只有一个字符串类，即`basic_string`。`basic_string`管理一个零结尾的字符数组。字符类型由模板参数决定。通常，`basic_string`被处理为不透明对象。可以获得一个只读指针来访问缓冲区，但写操作都是由`basic_string`的成员函数进行的。
 
 `basic_string`预定义了二个特例：`string`，含有`char`类型字符；`which`，含有`wchar_t`类型字符。没有内建的`TCHAR`特例，可用下面的代码实现：
-```cpp
+{% highlight cpp script %}
 // 特例化
 typedef basic_string tstring; // TCHAR字符串
 // 构造
@@ -424,18 +424,18 @@ tstring tstr = _T("TCHAR string"); // 从LPCTSTR构造
 LPCSTR psz = str.c_str(); // 指向str缓冲区的只读指针
 LPCWSTR pwsz = wstr.c_str(); // 指向wstr缓冲区的只读指针
 LPCTSTR ptsz = tstr.c_str(); // 指向tstr缓冲区的只读指针
-```
+{% endhighlight %}
 与`_bstr_t` 不同，`basic_string`不能在字符集之间进行转换。但是如果一个构造函数接受相应的字符类型，可以将由`c_str()`返回的指针传递给这个构造函数。例如：
-```cpp
+{% highlight cpp script %}
 // 从basic_string构造_bstr_t 
 _bstr_t bs1 = str.c_str();  // 从LPCSTR构造 _bstr_t
 _bstr_t bs2 = wstr.c_str(); // 从LPCWSTR构造 _bstr_t
-```
+{% endhighlight %}
 ATL类
 --------------------------------------------------
 ###**CComBSTR**
 `CComBSTR` 是`ATL`的`BSTR`包装类。某些情况下比`_bstr_t` 更有用。最主要的是，`CComBSTR`允许操作隐含`BSTR`。就是说，传递一个`CComBSTR`对象给`COM`方法时，`CComBSTR`对象会自动管理`BSTR`内存。例如，要调用下面的接口函数：
-```cpp
+{% highlight cpp script %}
 // 简单接口
 struct IStuff : public IUnknown
 {
@@ -443,18 +443,18 @@ struct IStuff : public IUnknown
   STDMETHOD(SetText)(BSTR bsText);
   STDMETHOD(GetText)(BSTR* pbsText);
 };
-```
+{% endhighlight %}
 `CComBSTR` 有一个`BSTR`操作方法，能将`BSTR`直接传递给`SetText()`。还有一个引用操作(`operator &`)方法，返回`BSTR*`，将`BSTR*`传递给需要它的有关函数。
-```cpp
+{% highlight cpp script %}
 CComBSTR bs1;
 CComBSTR bs2 = "new text";
 pStuff->GetText ( &bs1 );       // ok, 取得内部BSTR地址
 pStuff->SetText ( bs2 );        // ok, 调用BSTR转换
 pStuff->SetText ( (BSTR) bs2 ); // cast ok, 同上
-```
+{% endhighlight %}
 ###**CComBSTR**
 `CComBSTR`有类似于 `_bstr_t` 的构造函数。但没有内建`MBCS`字符串的转换函数。可以调用`ATL`宏进行转换。
-```cpp
+{% highlight cpp script %}
 // 构造
 CComBSTR bs1 = "char string"; // 从LPCSTR构造
 CComBSTR bs2 = L"wide char string"; // 从LPCWSTR构造
@@ -472,18 +472,18 @@ bstr4 = bs1.Detach(); // bs1不再管理它的BSTR
 // ...
 SysFreeString ( bstr3 );
 SysFreeString ( bstr4 );
-```
+{% endhighlight %}
 上面的最后一个示例用到了`Detach()`方法。该方法调用后，`CComBSTR`对象就不再管理它的BSTR或其相应内存。所以`bstr4`就必须调用`SysFreeString()`。
 
 最后讨论一下引用操作符(`operator &`)。它的超越使得有些`STL`集合(如`list`)不能直接使用`CComBSTR`。在集合上使用引用操作返回指向包容类的指针。但是在`CComBSTR`上使用引用操作，返回的是`BSTR*`，不是`CComBSTR*`。不过可以用`ATL`的`CAdapt`类来解决这个问题。例如，要建立一个`CComBSTR`的队列，可以声明为：
-```cpp
+{% highlight cpp script %}
 std::list< CAdapt> bstr_list;
-```
+{% endhighlight %}
 `CAdapt` 提供集合所需的操作，是隐含于代码的。这时使用`bstr_list` 就象在操作一个`CComBSTR`队列。
 
 ###**CComVariant**
 `CComVariant` 是`VARIANT`的包装类。但与 `_variant_t` 不同，它的`VARIANT`不是隐含的，可以直接操作类里的`VARIANT`成员。`CComVariant` 提供多种构造函数和多类型操作。这里只介绍与字符串有关的操作。
-```cpp
+{% highlight cpp script %}
 // 构造
 CComVariant v1 = "char string";       // 从LPCSTR构造
 CComVariant v2 = L"wide char string"; // 从LPCWSTR构造
@@ -492,14 +492,14 @@ CComVariant v3 = (BSTR) bs1;          // 从BSTR拷贝
 
 // 数据萃取
 CComBSTR bs2 = v1.bstrVal;            // 从VARIANT提取BSTR
-```
+{% endhighlight %}
 跟`_variant_t` 不同，`CComVariant`没有不同`VARIANT`类型之间的转换操作。必须直接操作`VARIANT`成员，并确定该`VARIANT`的类型无误。调用`ChangeType()`方法可将`CComVariant`数据转换为`BSTR`。
-```cpp
+{% highlight cpp script %}
 CComVariant v4 = ... // 从某种类型初始化 v4
 CComBSTR bs3;
 if ( SUCCEEDED( v4.ChangeType ( VT_BSTR ) ))
     bs3 = v4.bstrVal;
-```
+{% endhighlight %}
 
 ATL转换宏
 --------------------------------------------------
@@ -517,7 +517,7 @@ BSTR：BSTR (只用于目的类型)
 转换得到的结果字符串，只要不是`BSTR`，都存储在堆栈中。如果要在函数外使用这些字符串，就要将这些字符串拷贝到其它的字符串类。如果结果是`BSTR`，内存不会自动释放，因此必须将返回值分配给一个`BSTR`变量或`BSTR`的包装类，以避免内存泄露。
 
 下面是若干宏转换示例：
-```cpp
+{% highlight cpp script %}
 // 带有字符串的函数：
 void Foo ( LPCWSTR wstr );
 void Bar ( BSTR bstr );
@@ -555,7 +555,7 @@ str2 = W2CA(bs3);      // 转换为MBCS字符串
 SysFreeString ( bs3 ); // 释放bs3
 }
 
-```
+{% endhighlight %}
 可以看到，向一个需要某种类型参数的函数传递另一种类型的参数，用宏转换是非常方便的。
 
 
@@ -564,7 +564,7 @@ SysFreeString ( bs3 ); // 释放bs3
 MFC类 CString
 --------------------------------------------------
 `MFC`的`CString`含有`TCHAR`，它的实际字符类型取决于预处理标记的设置。通常，`CString`象`STL`字符串一样是不透明对象，只能用`CString`的方法来修改。`CString`比`STL`字符串更优越的是它的构造函数接受`MBCS`和`Unicode`字符串。并且可以转换为`LPCTSTR`，因此可以向接受`LPCTSTR`的函数直接传递`CString`对象，不必调用`c_str()`方法。
-```cpp
+{% highlight cpp script %}
 // 构造
 CString s1 = "char string"; // 从LPCSTR构造
 CString s2 = L"wide char string"; // 从LPCWSTR构造
@@ -574,9 +574,9 @@ CString s4 = "New window text";
 SetWindowText ( hwndSomeWindow, s4 );
 // 或者，显式地做强制类型转换：
 SetWindowText ( hwndSomeWindow, (LPCTSTR) s4 );
-```
+{% endhighlight %}
 也可以从字符串表加载字符串。`CString`通过`LoadString()`来构造对象。用`Format()`方法可有选择地从字符串表读取一定格式的字符串。
-```cpp
+{% highlight cpp script %}
 // 从字符串表构造/加载
 CString s5 ( (LPCTSTR) IDS_SOME_STR );  // 从字符串表加载
 CString s6, s7;
@@ -584,13 +584,13 @@ CString s6, s7;
 s6.LoadString ( IDS_SOME_STR );
 // 从字符串表加载打印格式的字符串
 s7.Format ( IDS_SOME_FORMAT, "bob", nSomeStuff, ... );
-```
+{% endhighlight %}
 第一个构造函数看上去有点怪，但它的确是文档标定的字符串加载方式。
 
 注意，`CString`只允许一种强制类型转换，即强制转换为`LPCTSTR`。强制转换为`LPTSTR` (非常量指针)是错误的。按照老习惯，将`CString`强制转换为`LPTSTR`只能伤害自己。有时在程序中没有发现出错，那只是碰巧。转换到非常量指针的正确方法是调用`GetBuffer()`方法。
 
 下面以往队列加入元素为例说明如何正确地使用`CString`：
-```cpp
+{% highlight cpp script %}
 CString str = _T("new text");
 LVITEM item = {0};
 item.mask = LVIF_TEXT;
@@ -599,7 +599,7 @@ item.pszText = (LPTSTR)(LPCTSTR) str; // 错！
 item.pszText = str.GetBuffer(0);      // 正确
 ListView_SetItem ( &item );
 str.ReleaseBuffer();  // 将队列返回给str
-```
+{% endhighlight %}
 `pszText`成员是`LPTSTR`，一个非常量指针，因此要用`str`的`GetBuffer()`。`GetBuffer()`的参数是`CString`分配的最小缓冲区。如果要分配一个1K的`TCHAR`，调用`GetBuffer(1024)`。参数为0，只返回指向字符串的指针。
 
 上面示例的出错语句可以通过编译，甚至可以正常工作，如果恰好就是这个类型。但这不证明语法正确。进行非常量的强制类型转换，打破了面向对象的封装原则，并逾越了`CString`的内部操作。如果你习惯进行这样的强制类型转换，终会遇到出错，可你未必知道错在何处，因为你到处都在做这样的转换，而代码也都能运行。
@@ -607,7 +607,7 @@ str.ReleaseBuffer();  // 将队列返回给str
 知道为什么人们总在抱怨有缺陷的软件吗？不正确的代码就bug的滋生地。然道你愿意编写明知有错的代码让臭虫有机可乘？还是花些时间学习`CString`的正确用法让你的代码能够100%的正确吧。
 
 `CString`还有二个函数能够从`CString`中得到`BSTR`，并在必要时转换成`Unicode`。那就是`AllocSysString()`和`SetSysString()`。除了`SetSysString()`使用`BSTR*`参数外，二者一样。
-```cpp
+{% highlight cpp script %}
 // 转换成BSTR
 CString s5 = "Bob!";
 BSTR bs1 = NULL, bs2 = NULL;
@@ -616,16 +616,16 @@ s5.SetSysString ( &bs2 );
 // ...
 SysFreeString ( bs1 );
 SysFreeString ( bs2 );
-```
+{% endhighlight %}
 `COleVariant` 与`CComVariant` 非常相似。`COleVariant` 继承于`VARIANT`，可以传递给需要`VARIANT`的函数。但又与`CComVariant` 不同，`COleVariant` 只有一个`LPCTSTR`的构造函数，不提供单独的`LPCSTR`和`LPCWSTR`的构造函数。在大多情况下，没有问题，因为总是愿意把字符串处理为`LPCTSTR`。但你必须知道这点。`COleVariant` 也有接受`CString`的构造函数。
-```cpp
+{% highlight cpp script %}
 // 构造
 CString s1 = _T("tchar string");
 COleVariant v1 = _T("Bob"); // 从LPCTSTR构造
 COleVariant v2 = s1; // 从CString拷贝
-```
+{% endhighlight %}
 对于`CComVariant`，必须直接处理`VARIANT`成员，用`ChangeType()`方法在必要时将其转换为字符串。但是，`COleVariant::ChangeType()` 在转换失败时会抛出异常，而不是返回`HRESULT`的出错码。
-```cpp
+{% highlight cpp script %}
 // 数据萃取
 COleVariant v3 = ...; // 从某种类型构造v3
 BSTR bs = NULL;
@@ -639,54 +639,54 @@ catch ( COleException* e )
     // 出错，无法转换
 }
 SysFreeString ( bs );
-```
+{% endhighlight %}
 WTL类 CString、CLR 及 VC 7 类
 --------------------------------------------------
 > `WTL`的`CString`与`MFC`的`CString`的行为完全相同，参阅上面关于`MFC` `CString`的说明即可。
 
 `System::String` 是`.NET`的字符串类。在其内部，`String`对象是一个不变的字符序列。任何操作`String`对象的`String`方法都返回一个新的`String`对象，因为原有的`String`对象要保持不变。`String`类有一个特性，当多个`String`都指向同一组字符集时，它们其实是指向同一个对象。`Managed Extensions C++` 的字符串有一个新的前缀S，用来表明是一个`managed string`字符串。
-```cpp
+{% highlight cpp script %}
 // 构造
 String* ms = S"This is a nice managed string";
-```
+{% endhighlight %}
 可以用`unmanaged string`字符串来构造`String`对象，但不如用`managed string`构造`String`对象有效。原因是所有相同的具有S前缀的字符串都指向同一个对象，而`unmanaged string`没有这个特点。下面的例子可以说明得更清楚些：
-```cpp
+{% highlight cpp script %}
 String* ms1 = S"this is nice";
 String* ms2 = S"this is nice";
 String* ms3 = L"this is nice";
 Console::WriteLine ( ms1 == ms2 ); // 输出true
 Console::WriteLine ( ms1 == ms3);  // 输出false
-```
+{% endhighlight %}
 要与没有S前缀的字符串做比较，用`String::CompareTo()`方法来实现，如：
-```cpp
+{% highlight cpp script %}
 Console::WriteLine ( ms1->CompareTo(ms2) );
 Console::WriteLine ( ms1->CompareTo(ms3) );
-```
+{% endhighlight %}
 二者都输出0，说明字符串相等。
 
 在`String`和`MFC 7`的`CString`之间转换很容易。`CString`可以转换为`LPCTSTR`，`String`有接受`char* `和 `wchar_t*` 的二种构造函数。因此可以直接把`CString`传递给`String`的构造函数：
-```cpp
+{% highlight cpp script %}
 CString s1 ( "hello world" );
 String* s2 ( s1 );  // 从CString拷贝
-```  
+{% endhighlight %}  
 反向转换的方法也类似：
-```cpp
+{% highlight cpp script %}
 String* s1 = S"Three cats";
 CString s2 ( s1 );
-```
+{% endhighlight %}
 可能有点迷惑。从`VS.NET`开始，`CString`有一个接受`String`对象的构造函数，所以是正确的。
-```cpp
+{% highlight cpp script %}
 CStringT ( System::String* pString );
-```
+{% endhighlight %}
 为了加速操作，有时可以用基础字符串(`underlying string`)：
-```cpp
+{% highlight cpp script %}
 String* s1 = S"Three cats";
 Console::WriteLine ( s1 );
 const __wchar_t __pin* pstr = PtrToStringChars(s1);
 for ( int i = 0; i < wcslen(pstr); i++ )
     (*const_cast<__wchar_t*>(pstr+i))++;
 Console::WriteLine ( s1 );
-```
+{% endhighlight %}
 `PtrToStringChars()` 返回指向基础字符串的 `const __wchar_t*` 指针，可以防止在操作字符串时，垃圾收集器去除该字符串。
 
 总结
@@ -696,10 +696,10 @@ Console::WriteLine ( s1 );
 对字符串包装类使用`printf()`或其它类似功能的函数时要特别小心。包括`sprintf()`函数及其变种，以及`TRACE` 和`ATLTRACE` 宏。它们的参数都不做类型检验，一定要给它们传递C语言字符串，而不是整个`string`对象。
 
 例如，要向`ATLTRACE()`传递一个`_bstr_t` 里的字符串，必须显式用(`LPCSTR`)或 (`LPCWSTR`)进行强制类型转换：
-```cpp
+{% highlight cpp script %}
 _bstr_t bs = L"Bob!";
 ATLTRACE("The string is: %s in line %d\n", (LPCSTR) bs, nLine);
-```
+{% endhighlight %}
 如果忘了用强制类型转换，直接把整个 `_bstr_t` 对象传递给`ATLTRACE`，跟踪消息将输出无意义的东西，因为`_bstr_t` 变量内的所有数据都进栈了。
 
 所有类的总结
