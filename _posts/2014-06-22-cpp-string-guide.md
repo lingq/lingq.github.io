@@ -163,9 +163,9 @@ Win32 API中的MBCS 和 Unicode API的二个字符集
 BOOL WINAPI SetWindowTextA ( HWND hWnd, LPCSTR lpString );
 BOOL WINAPI SetWindowTextW ( HWND hWnd, LPCWSTR lpString );
 #ifdef UNICODE
-　#define SetWindowText  SetWindowTextW
+#define SetWindowText  SetWindowTextW
 #else
-　#define SetWindowText  SetWindowTextA
+#define SetWindowText  SetWindowTextA
 #endif
 ```
 编写MBCS应用时，不必定义UNICODE，预处理为：
