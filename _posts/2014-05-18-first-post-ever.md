@@ -48,6 +48,7 @@ icon: coffee
 | LPCOLESTR | constant string of OLECHAR (**const OLECHAR***) |
 
 还有以下二个宏让相同的代码能够适用于MBCS和Unicode编码：
+
 | Type        | Meaning   | 
 | :--------:   | :-----:  |
 | _T(x) | Prepends L to the literal in Unicode builds. |
@@ -66,6 +67,4 @@ icon: coffee
 | COleVariant | BSTR | no | no | no | yes | yes | in MBCS builds| in Unicode builds|
 
 
-{:toc}
 
-{{ page.content | fancytoc }}
