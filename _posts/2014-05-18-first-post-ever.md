@@ -80,5 +80,4 @@ main()
 {
   SomeFunc ( (LPCWSTR) "C:\\foo.txt" );  // 错！
 }
-{% endhighlight %}
 ```
