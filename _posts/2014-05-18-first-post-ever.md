@@ -64,3 +64,6 @@ icon: coffee
 | CComVariant | BSTR | no | no | no | yes | yes | yes| yes|
 | CString | TCHAR | no | in MBCS builds, cast | no | in Unicode builds | no | yes| yes|
 | COleVariant | BSTR | no | no | no | yes | yes | in MBCS builds| in Unicode builds|
+
+
+{:toc}
