@@ -5,6 +5,8 @@
   {% include dmc/comments-providers/duoshuo %}
 {% when "custom" %}
   {% include custom/comments %}
+{% when "disqus" %}
+  {% include dmc/comments-providers/disqus %}
 {% endcase %}
 
 {% endif %}
