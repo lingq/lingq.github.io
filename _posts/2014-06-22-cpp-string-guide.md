@@ -230,8 +230,10 @@ TCHAR szNewText[] = _T("we love Bob!");
 
 **String 和 TCHAR 类型定义**
 Win32 API 文件中列出的函数名都是通用名(如`SetWindowText`)，所有的字符串都按照`TCHAR`类型处理。(只有XP除外，XP只使用Unicode类型)。下面是MSDN给出的常用类型定义：
+
+
 | 类型        | MBCS 编码中的意义   |  Unicode 编码中的意义  |
-| :--------:   | :-----:  | :----:  |
+| :--------: | :-----:  | :----:  |
 | WCHAR | wchar_t | wchar_t|
 | LPSTR | zero-terminated string of char (char*) | zero-terminated string of char (char*)|
 | LPCSTR | constant zero-terminated string of char (constchar*) | constant zero-terminated string of char (constchar*)|
@@ -289,6 +291,8 @@ main()
 C语言字符串与类型定义：
 --------------------------------------------------
 如指南的第一部分所述，Windows API定义了`TCHAR`术语。它可用于MBCS或Unicode编码字符，取决于预处理设置为`_MBCS` 或 `_UNICODE`标记。关于`TCHAR`的详细说明请阅指南的第一部分。为便于叙述，下面给出字符类型定义：
+
+
 | Type        | Meaning   | 
 | :--------:   | :-----:  |
 | WCHAR | Unicode character (**wchar_t**) |
@@ -300,20 +304,27 @@ C语言字符串与类型定义：
 | LPTSTR | string of TCHAR (**TCHAR***) |
 | LPCTSTR | constant string of TCHAR (**const TCHAR***) |
 
+
 另外还有一个字符类型`OLECHAR`。这是一种对象链接与嵌入的数据类型(比如嵌入Word文档)。这个类型通常定义为`wchar_t`。如果将预处理设置定义为`OLE2ANSI`，`OLECHAR`将被定义为`char`类型。现在已经不再定义`OLE2ANSI`(它只在MFC 3以前版本中使用)，所以我将`OLECHAR`作为`Unicode`字符处理。
 
 下面是与`OLECHAR`相关的类型定义：
+
+
 | Type        | Meaning   | 
 | :--------:   | :-----:  |
 | OLECHAR | Unicode character (**wchar_t**) |
 | LPOLESTR | string of OLECHAR (**OLECHAR***) |
 | LPCOLESTR | constant string of OLECHAR (**const OLECHAR***) |
 
+
 还有以下二个宏让相同的代码能够适用于MBCS和Unicode编码：
+
+
 | Type        | Meaning   | 
 | :--------:   | :-----:  |
 | _T(x) | Prepends L to the literal in Unicode builds. |
 | OLESTR(x) | Prepends L to the literal to make it an LPCOLESTR. |
+
 
 宏`_T`有几种形式，功能都相同。如： `TEXT`, `_TEXT`, `__TEXT`, 和 `__T`这四种宏的功能相同。
 
@@ -713,6 +724,8 @@ ATLTRACE("The string is: %s in line %d\n", (LPCSTR) bs, nLine);
 所有类的总结
 --------------------------------------------------
 常用的字符串类之间的转换方法是：将源字符串转换为C类型字符串指针，然后将该指针传递给目标类的构造函数。下面列出将字符串转换为C类型指针的方法，以及哪些类的构造函数接受C类型指针。
+
+
 | Class | string type  | convert to char*? | convert to const char*? | convert to wchar_t*? | convert to const wchar_t*? | convert to BSTR? | construct from char*? | construct from wchar_t*?|
 | :--------:   | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  | :-----:  |
 | _bstr_t | BSTR | yes, cast | yes, cast | yes, cast | yes, cast | yes | yes | yes|
@@ -723,6 +736,7 @@ ATLTRACE("The string is: %s in line %d\n", (LPCSTR) bs, nLine);
 | CComVariant | BSTR | no | no | no | yes | yes | yes| yes|
 | CString | TCHAR | no | in MBCS builds, cast | no | in Unicode builds | no | yes| yes|
 | COleVariant | BSTR | no | no | no | yes | yes | in MBCS builds| in Unicode builds|
+
 
 
 附注：
