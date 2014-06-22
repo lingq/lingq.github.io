@@ -6,13 +6,11 @@ pygments: true
 paginate: 4
 # enable github favored Markdown
 markdown: redcarpet
-redcarpet: 
-  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
 
 excerpt_separator: <!-- more -->
 
-title : 书犹药也,善读之可以医愚
-tagline: OpenCV OpenCL 
+title :  不明白 
+tagline: CPP 
 author : 
   name : DevilMayCry
   email : xx
