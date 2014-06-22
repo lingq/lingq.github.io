@@ -1,11 +1,11 @@
 ---
 layout: post
-keywords: c++,字符串
+keywords: cpp,字符串
 description: C++字符串完全指南 
 title: C++字符串完全指南 
-categories: [c++]
-tags: [C++]
-group: C++
+categories: [Cpp]
+tags: [Cpp]
+group: Cpp
 ---
 {% include dmc/setup %}
 C++字符串完全指南 - Win32字符编码
