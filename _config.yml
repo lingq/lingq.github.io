@@ -7,8 +7,10 @@ paginate: 4
 # enable github favored Markdown
 markdown: redcarpet
 redcarpet: 
-  extensions: ["fenced_code_blocks", "autolink", "tables","highlight","footnotes"]
-
+#  extensions: ["fenced_code_blocks", "autolink", "tables","highlight","footnotes"]
+  extensions: 
+    - with_toc_data
+    - html_toc
 excerpt_separator: <!-- more -->
 
 title :  不明白 
