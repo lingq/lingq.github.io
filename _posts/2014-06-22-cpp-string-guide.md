@@ -246,11 +246,11 @@ Win32 API 文件中列出的函数名都是通用名(如`SetWindowText`)，所�
 可能会有疑问：“为什么要用Unicode？我一直用的都是普通字符串。”
 
 在三种情况下要用到Unicode：
-> **1.程序只运行于Windows NT。
+> **1.程序只运行于Windows NT。**
 
-2.处理的字符串长于MAX_PATH定义的字符数。
+> **2.处理的字符串长于MAX_PATH定义的字符数。**
 
-3.程序用于Windows XP中的新接口，那里没有A/W版本之分。**
+> **3.程序用于Windows XP中的新接口，那里没有A/W版本之分。**
 
 大部分Unicode API不可用于Windows 9x。所以如果程序要在Windows 9x上运行的话，要强制使用MBCS API (微软推出一个可运行于Windows 9x的新库，叫做Microsoft Layer for Unicode。但我没有试用过，无法说明它的好坏)。相反，NT内部全部使用Unicode编码，使用Unicode API可以加速程序运行。每当将字符串处理为MBCS API时，操作系统都会将字符串转换为Unicode并调用相应的Unicode API 函数。对于返回的字符串，操作系统要做同样的转换。尽管这些转换经过了高度优化，模块尽可能地压缩到最小，但毕竟会影响到程序的运行速度。
 
@@ -362,9 +362,11 @@ _bstr_t
 `_bstr_t` 是`BSTR`的完全包装类。实际上，它隐含了`BSTR`。它提供多种构造函数，能够处理隐含的C类型字符串。但它本身却不提供`BSTR`的处理机制，所以不能作为`COM`方法的输出参数`[out]`。如果要用到`BSTR*` 类型数据，用`ATL`的`CComBSTR`类更为方便。
 
 `_bstr_t` 数据可以传递给需要`BSTR`数据的函数，但必须满足以下三个条件：
-> **1.`_bstr_t` 具有能够转换为`wchar_t*`类型数据的函数。
-2. 根据`BSTR`定义，使得`wchar_t*` 和`BSTR`对于编译器来说是相同的。
-3.`_bstr_t`内部保留的指向内存数据块的指针 `wchar_t*` 要遵循`BSTR`格式。**
+> **1.`_bstr_t` 具有能够转换为`wchar_t*`类型数据的函数。**
+
+> **2. 根据`BSTR`定义，使得`wchar_t*` 和`BSTR`对于编译器来说是相同的。**
+
+> **3.`_bstr_t`内部保留的指向内存数据块的指针 `wchar_t*` 要遵循`BSTR`格式。**
 
 满足这些条件，即使没有相应的`BSTR`转换文档，`_bstr_t` 也能正常工作。示例如下：
 {% highlight cpp script %}
@@ -507,10 +509,14 @@ ATL转换宏
 --------------------------------------------------
 `ATL`的字符串转换宏可以方便地转换不同编码的字符，用在函数中很有效。宏按照`[source type]2[new type]` 或 `[source type]2C[new type]`格式命名。后者转换为一个常量指针 (名字内含"C")。类型缩写如下：
 > A：MBCS字符串，`char*` (A for ANSI) 
-W：Unicode字符串，`wchar_t*` (W for wide) 
-T ：TCHAR字符串，`TCHAR*` 
-OLE：OLECHAR字符串，`OLECHAR*` (实际等于W) 
-BSTR：BSTR (只用于目的类型)
+
+> W：Unicode字符串，`wchar_t*` (W for wide) 
+
+> T ：TCHAR字符串，`TCHAR*` 
+
+> OLE：OLECHAR字符串，`OLECHAR*` (实际等于W) 
+
+> BSTR：BSTR (只用于目的类型)
 
 例如，`W2A()`将`Unicode`字符串转换为`MBCS`字符串，`T2CW()`将`TCHAR`字符串转换为`Unicode`字符串常量。
 
@@ -721,12 +727,17 @@ ATLTRACE("The string is: %s in line %d\n", (LPCSTR) bs, nLine);
 
 附注：
 --------------------------------------------------
->*1.虽然 `_bstr_t` 可以转换为非常量指针，但对内部缓冲区的修改可能导致内存溢出，或在释放`BSTR`时导致内存泄露。
-2.`bstr_t` 的`BSTR`内含 `wchar_t*` 变量，所以可将`const wchar_t*` 转换到`BSTR`。但这个用法将来可能会改变，使用时要小心。
-3.如果转换到`BSTR`失败，将抛出异常。
-4.用`ChangeType()`处理`VARIANT`的`bstrVal`。在`MFC`转换失败将抛出异常。
-5.虽然没有`BSTR`的转换函数，但`AllocSysString()`可返回一个新的`BSTR`。
-6.用`GetBuffer()`方法可临时得到一个非常量`TCHAR`指针。*
+>*1.虽然 `_bstr_t` 可以转换为非常量指针，但对内部缓冲区的修改可能导致内存溢出，或在释放`BSTR`时导致内存泄露。*
+
+> *2.`bstr_t` 的`BSTR`内含 `wchar_t*` 变量，所以可将`const wchar_t*` 转换到`BSTR`。但这个用法将来可能会改变，使用时要小心。*
+
+> *3.如果转换到`BSTR`失败，将抛出异常。*
+
+> *4.用`ChangeType()`处理`VARIANT`的`bstrVal`。在`MFC`转换失败将抛出异常。*
+
+> *5.虽然没有`BSTR`的转换函数，但`AllocSysString()`可返回一个新的`BSTR`。*
+
+> *6.用`GetBuffer()`方法可临时得到一个非常量`TCHAR`指针。*
 
 
 参考
