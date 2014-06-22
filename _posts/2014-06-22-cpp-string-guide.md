@@ -247,7 +247,9 @@ Win32 API 文件中列出的函数名都是通用名(如`SetWindowText`)，所�
 
 在三种情况下要用到Unicode：
 > 1.程序只运行于Windows NT。
+
 > 2.处理的字符串长于MAX_PATH定义的字符数。
+
 > 3.程序用于Windows XP中的新接口，那里没有A/W版本之分。
 
 大部分Unicode API不可用于Windows 9x。所以如果程序要在Windows 9x上运行的话，要强制使用MBCS API (微软推出一个可运行于Windows 9x的新库，叫做Microsoft Layer for Unicode。但我没有试用过，无法说明它的好坏)。相反，NT内部全部使用Unicode编码，使用Unicode API可以加速程序运行。每当将字符串处理为MBCS API时，操作系统都会将字符串转换为Unicode并调用相应的Unicode API 函数。对于返回的字符串，操作系统要做同样的转换。尽管这些转换经过了高度优化，模块尽可能地压缩到最小，但毕竟会影响到程序的运行速度。
