@@ -83,9 +83,9 @@ dmc :
   # Set 'provider' to false to turn commenting off globally.
   #
   comments :
-    provider : duoshuo
-    duoshuo :
-      short_name : DevilMayCry
+    provider : disqus
+    disqus :
+      short_name : lingq
    
   # Settings for analytics helper
   # Set 'provider' to the analytics provider you want to use.
@@ -94,7 +94,7 @@ dmc :
   analytics :
     provider : google 
     google : 
-        tracking_id : 'UA-41397531-1'
+        tracking_id : 'UA'
 
   # Settings for sharing helper. 
   # Sharing is for things like tweet, plusone, like, reddit buttons etc.
