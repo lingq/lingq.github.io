@@ -192,9 +192,9 @@ SetWindowTextW ( hwnd, szNewText );
 {% highlight cpp script %}
 HWND hwnd = GetSomeWindowHandle();
 #ifdef UNICODE
-　wchar_t szNewText[] = L"we love Bob!";
+  wchar_t szNewText[] = L"we love Bob!";
 #else
-　char szNewText[] = "we love Bob!";
+  char szNewText[] = "we love Bob!";
 #endif
 SetWindowText ( hwnd, szNewText );
 {% endhighlight %}
@@ -204,9 +204,9 @@ SetWindowText ( hwnd, szNewText );
 `TCHAR`的宏定义如下：
 {% highlight cpp script %}
 #ifdef UNICODE
-　typedef wchar_t TCHAR;
+  typedef wchar_t TCHAR;
 #else
-　typedef char TCHAR;
+  typedef char TCHAR;
 #endif
 {% endhighlight %}
 所以，`TCHAR`中在MBCS程序中是`char`类型，在Unicode中是 `wchar_t` 类型。
@@ -214,9 +214,9 @@ SetWindowText ( hwnd, szNewText );
 对于Unicode字符串，还有个 _T() 宏，用于解决 L 前缀：
 {% highlight cpp script %}
 #ifdef UNICODE
-　#define _T(x) L##x
+  #define _T(x) L##x
 #else
-　#define _T(x) x
+  #define _T(x) x
 #endif
 {% endhighlight %}
 `##` 是预处理算子，将二个变量粘贴在一起。不管什么时候都对字符串用 `_T` 宏处理，这样就可以在Unicode编码中给字符串加上L前缀，如：
