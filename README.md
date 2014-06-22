@@ -1,4 +1,6 @@
-# pengx17 个人博客
+# DevilMayCry 个人博客
+
+### 克隆自：[pengx17](http://pengx17.me/)
 
 ### 克隆自：[codepiano](https://codepiano.github.io)
 
