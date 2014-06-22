@@ -66,5 +66,19 @@ icon: coffee
 | CString | TCHAR | no | in MBCS builds, cast | no | in Unicode builds | no | yes| yes|
 | COleVariant | BSTR | no | no | no | yes | yes | in MBCS builds| in Unicode builds|
 
+{% highlight cpp script %}
+void SomeFunc ( LPCWSTR widestr );
+main()
+{
+  SomeFunc ( (LPCWSTR) "C:\\foo.txt" );  // 错！
+}
+{% endhighlight %}
 
-
+```cpp
+void SomeFunc ( LPCWSTR widestr );
+main()
+{
+  SomeFunc ( (LPCWSTR) "C:\\foo.txt" );  // 错！
+}
+{% endhighlight %}
+```
