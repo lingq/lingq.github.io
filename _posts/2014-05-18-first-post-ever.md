@@ -9,7 +9,7 @@ group: archive
 icon: coffee
 ---
 
-留白，有空再写
+ 测试markdown语法专用
 
 | Left-Aligned  | Center Aligned  | Right Aligned |
 | :------------ |:---------------:| -----:|
@@ -67,3 +67,5 @@ icon: coffee
 
 
 {:toc}
+
+{{ page.content | fancytoc }}
